@@ -1,11 +1,38 @@
 @import "tailwindcss";
 
+/*
+  AIIA brand theme, taken from aiia.com.au
+  - Primary red #c41917 (hover #a3140f), coral logo red #ee403d
+  - Charcoal #1e1e1e, footer grey #3e3e3e
+  - Yellow highlight #fdd700
+  - Warm neutrals #faf9f7 / #f3f1f1 / #e8e4e0
+  - Poppins for headings, Manrope for body copy
+*/
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope), Helvetica, Arial, sans-serif;
+  --font-heading: var(--font-poppins), Helvetica, Arial, sans-serif;
+
+  --color-brand-red: #c41917;
+  --color-brand-red-dark: #a3140f;
+  --color-brand-coral: #ee403d;
+  --color-brand-black: #1e1e1e;
+  --color-brand-charcoal: #3e3e3e;
+  --color-brand-yellow: #fdd700;
+  --color-brand-cream: #faf9f7;
+  --color-brand-stone: #f3f1f1;
+  --color-brand-sand: #e8e4e0;
+  --color-brand-grey: #8b857f;
 }
 
 body {
-  background: #f4f4f5;
-  color: #18181b;
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--color-brand-stone);
+  color: var(--color-brand-black);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
 }
