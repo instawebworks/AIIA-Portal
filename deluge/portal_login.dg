@@ -1,0 +1,86 @@
+// =====================================================================
+//  Zoho CRM standalone function:  portal_login
+//
+//  Setup > Developer Hub > Functions > + New Function
+//     Category : Standalone
+//     Name     : portal_login
+//     Arguments: email (string), password (string)
+//  Then "..." > REST API > enable "API Key" and copy the URL into
+//  ZOHO_PORTAL_LOGIN_URL in the Next.js .env.local.
+//
+//  Fields used on Contacts (change the constants if your API names differ):
+//     Portal_Access    checkbox
+//     Email            standard email field
+//     Portal_Password  single line, holds the SHA-256 hash, never the plain text
+// =====================================================================
+string standalone.portal_login(string email, string password)
+{
+	ACCESS_FIELD = "Portal_Access";
+	EMAIL_FIELD = "Email";
+	PASSWORD_FIELD = "Portal_Password";
+	PEPPER = "aiia-portal-2026";
+	// PEPPER must be identical in portal_set_password.
+	result = Map();
+	email = ifnull(email,"").trim().toLowerCase();
+	password = ifnull(password,"");
+	if(email == "" || password == "")
+	{
+		result.put("status","error");
+		result.put("message","Email and password are required.");
+		return result.toString();
+	}
+	// Look the contact up by email.
+	criteria = "(" + EMAIL_FIELD + ":equals:" + email + ")";
+	contacts = zoho.crm.searchRecords("Contacts",criteria,1,1);
+	if(contacts.size() == 0)
+	{
+		result.put("status","error");
+		result.put("message","Invalid email or password.");
+		return result.toString();
+	}
+	contact = contacts.get(0);
+	// Gate 1: Portal Access checkbox
+	hasAccess = ifnull(contact.get(ACCESS_FIELD),false);
+	if(hasAccess != true)
+	{
+		result.put("status","error");
+		result.put("message","Portal access has not been enabled for this contact. Please contact AIIA.");
+		return result.toString();
+	}
+	// Gate 2: password hash
+	storedHash = ifnull(contact.get(PASSWORD_FIELD),"");
+	incomingHash = zoho.encryption.sha256(PEPPER + password);
+	if(storedHash == "" || storedHash != incomingHash)
+	{
+		result.put("status","error");
+		result.put("message","Invalid email or password.");
+		return result.toString();
+	}
+	// Success: return only the fields the portal displays. Never return the hash.
+	account = contact.get("Account_Name");
+	orgName = "";
+	orgId = "";
+	if(account != null)
+	{
+		orgName = ifnull(account.get("name"),"");
+		orgId = ifnull(account.get("id"),"");
+	}
+	address = Map();
+	address.put("street",ifnull(contact.get("Mailing_Street"),""));
+	address.put("city",ifnull(contact.get("Mailing_City"),""));
+	address.put("state",ifnull(contact.get("Mailing_State"),""));
+	address.put("zip",ifnull(contact.get("Mailing_Zip"),""));
+	address.put("country",ifnull(contact.get("Mailing_Country"),""));
+	out = Map();
+	out.put("id",contact.get("id"));
+	out.put("name",ifnull(contact.get("Full_Name"),""));
+	out.put("first_name",ifnull(contact.get("First_Name"),""));
+	out.put("last_name",ifnull(contact.get("Last_Name"),""));
+	out.put("email",ifnull(contact.get(EMAIL_FIELD),""));
+	out.put("organization",orgName);
+	out.put("organization_id",orgId);
+	out.put("address",address);
+	result.put("status","success");
+	result.put("contact",out);
+	return result.toString();
+}
