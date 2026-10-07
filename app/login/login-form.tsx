@@ -7,18 +7,34 @@ const inputClass =
   "mt-1.5 w-full rounded-md border border-brand-sand bg-brand-cream px-3 py-2.5 text-brand-black outline-none transition focus:border-brand-red focus:bg-white focus:ring-2 focus:ring-brand-red/20";
 
 export default function LoginForm() {
-  const [state, action, pending] = useActionState<LoginState, FormData>(loginAction, {});
+  const [state, action, pending] = useActionState<LoginState, FormData>(
+    loginAction,
+    {},
+  );
 
   return (
     <form action={action} className="space-y-5">
       <div>
-        <label htmlFor="email" className="block text-sm font-semibold text-brand-black">
+        <label
+          htmlFor="email"
+          className="block text-sm font-semibold text-brand-black"
+        >
           Email
         </label>
-        <input id="email" name="email" type="email" autoComplete="username" required className={inputClass} />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="username"
+          required
+          className={inputClass}
+        />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-semibold text-brand-black">
+        <label
+          htmlFor="password"
+          className="block text-sm font-semibold text-brand-black"
+        >
           Password
         </label>
         <input
@@ -45,7 +61,7 @@ export default function LoginForm() {
         disabled={pending}
         className="font-heading w-full rounded-md bg-brand-red px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-brand-red-dark focus:outline-none focus:ring-2 focus:ring-brand-red/40 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
       >
-        {pending ? "Checking with CRM..." : "Sign in"}
+        {pending ? "Loading..." : "Sign in"}
       </button>
     </form>
   );
